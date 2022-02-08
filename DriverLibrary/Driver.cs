@@ -51,7 +51,7 @@ namespace DriverLibrary
             options.AddArgument("--ignore-certificate-errors");
 
             options.AddArgument("--start-maximized");
-            //  options.AddArgument("--headless");
+            options.AddArgument("--headless");
             driver = new ChromeDriver(options);
         }
 
