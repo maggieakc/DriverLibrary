@@ -1,0 +1,5 @@
+C:\Users\mcasey\OneDrive - McAfee\Documents\Visual Studio 2015\Projects\DriverLibrary\DriverLibrary\bin\Debug\DriverLibrary.dll
+C:\Users\mcasey\OneDrive - McAfee\Documents\Visual Studio 2015\Projects\DriverLibrary\DriverLibrary\bin\Debug\DriverLibrary.pdb
+C:\Users\mcasey\OneDrive - McAfee\Documents\Visual Studio 2015\Projects\DriverLibrary\DriverLibrary\obj\Debug\DriverLibrary.csprojResolveAssemblyReference.cache
+C:\Users\mcasey\OneDrive - McAfee\Documents\Visual Studio 2015\Projects\DriverLibrary\DriverLibrary\obj\Debug\DriverLibrary.dll
+C:\Users\mcasey\OneDrive - McAfee\Documents\Visual Studio 2015\Projects\DriverLibrary\DriverLibrary\obj\Debug\DriverLibrary.pdb
