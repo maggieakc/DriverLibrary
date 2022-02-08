@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
@@ -48,7 +49,9 @@ namespace DriverLibrary
 
             options.AddArgument("--ignore-ssl-errors=yes");
             options.AddArgument("--ignore-certificate-errors");
-            options.AddArgument("--headless");
+
+            options.AddArgument("--start-maximized");
+            //  options.AddArgument("--headless");
             driver = new ChromeDriver(options);
         }
 
@@ -166,7 +169,7 @@ namespace DriverLibrary
         public void Sleep(int sleepTime)
         {
             Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
-            Thread.Sleep(sleepTime);
+            Thread.Sleep(sleepTime*1000);
             Log.Write("Completed function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
         }
 
@@ -220,6 +223,19 @@ namespace DriverLibrary
         {
             Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
             ClickElement("ClickElementByID", id, screenshotName, sleepTime, arrayIndex);
+        }
+
+        /// <summary>
+        /// Click on an IWebElement with the provided classname, takes a screenshot if a name is provided, sleeps for longer than a second if a time is provided and clicks a specific index if one is provided
+        /// </summary>
+        /// <param name="className">Class name of the element to be clicked</param>
+        /// <param name="screenshotName">Name of the screenshot to be captured, defaults to null if none provided. No screenshot is captured if value is null</param>
+        /// <param name="sleepTime">Number of seconds to sleep between actions</param>
+        /// <param name="arrayIndex">Index of the element to be clicked, defaults to zero to click first instance of the element</param>
+        public void ClickElementByClass(string className, string screenshotName = null, int sleepTime = 5, int arrayIndex = 0)
+        {
+            Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            ClickElement("ClickElementByClass", className, screenshotName, sleepTime, arrayIndex);
         }
 
         /// <summary>
@@ -316,8 +332,9 @@ namespace DriverLibrary
         public string GetTextFromElementByID(string id)
         {
             Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            Sleep(2);
             IWebElement el = driver.FindElement(By.Id(id));
-            return el.GetAttribute("text");
+            return el.Text;
         }
 
 
@@ -371,6 +388,7 @@ namespace DriverLibrary
             Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
             IWebElement selectedElement = null;
             //All possible types of selector
+            Sleep(2);
             string[] selectorList = new string[] { "Xpath", "ID", "Class" };
 
             //Check if selectorType is valid and conatined within the array
@@ -415,6 +433,130 @@ namespace DriverLibrary
                 return false;
             }
 
+        }
+
+        public string GetCellContentByRowAndColumn(int rowIndex)
+        {
+
+            Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            IWebElement tableBody = driver.FindElements(By.TagName("tbody"))[0];
+            IWebElement row = tableBody.FindElements(By.TagName("tr"))[rowIndex];
+            IWebElement cell = row.FindElements(By.TagName("td"))[5];
+            return cell.Text;
+        }
+
+        public int GetRowCount()
+        {
+            Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            IWebElement tableBody = driver.FindElements(By.TagName("tbody"))[0];
+            return tableBody.FindElements(By.TagName("tr")).Count;
+        }
+
+        public void PressDownArrow()
+        {
+            Actions action = new Actions(driver);
+            action.SendKeys(Keys.ArrowDown);
+            action.Build().Perform();
+        }
+
+        /// <summary>
+        /// Send keys to an IWebElement with the provided ID, takes a screenshot if a name is provided, sleeps for longer than a second if a time is provided and sends keys to a specific index if one is provided
+        /// </summary>
+        /// <param name="id">ID of the element to be sent the keys</param>
+        /// <param name="keys"></param>
+        /// <param name="screenshotName">Name of the screenshot to be captured, defaults to null if none provided. No screenshot is captured if value is null</param>
+        /// <param name="sleepTime">Number of seconds to sleep between actions</param>
+        /// <param name="arrayIndex">Index of the element to be sent the keys, defaults to zero to send keys to the first instance of the element</param>
+        public void SendKeysToElementByID(string id, string keys, string screenshotName = null, int sleepTime = 5, int arrayIndex = 0)
+        {
+            Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            SendKeysToElement("SendKeysToElementByID", id, keys, screenshotName, sleepTime, arrayIndex);
+            Log.Write("Completed function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+        }
+
+        /// <summary>
+        /// Send keys to an element using the provided selector type and value. Take a screenshot if a name is provided
+        /// </summary>
+        /// <param name="selectorType">Selector type to be used, e.g id, xpath, classname</param>
+        /// <param name="element"> Value of the chosen selector</param>
+        /// <param name="screenshotName">Name of the screenshot to be captured, defaults to null. No screenshot is captured if value is null</param>
+        /// <param name="sleepTime">Time to sleep between actions, defaults to 1 second</param>
+        /// <param name="arrayIndex">Index of the element to be sent the keys, defaults to 0 to send keys to the first instance of the element</param>
+        private void SendKeysToElement(string selectorType, string element, string keys, string screenshotName = null, int sleepTime = 5, int arrayIndex = 0)
+        {
+            Log.Write("Starting function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
+            Sleep(sleepTime);
+
+            IWebElement selectedElement = null;
+            //All possible types of selector
+            string[] selectorList = new string[] { "SendKeysToElementByXpath", "SendKeysToElementByID", "SendKeysToElementByClass" };
+
+            //Check if selectorType is valid and conatined within the array
+            if (Array.IndexOf(selectorList, selectorType) > -1)
+            {
+                try
+                {
+                    switch (selectorType)
+                    {
+                        case "SendKeysToElementByXpath":
+                            selectedElement = driver.FindElements(By.XPath(element))[arrayIndex];
+                            break;
+                        case "SendKeysToElementByID":
+                            selectedElement = driver.FindElements(By.Id(element))[arrayIndex];
+                            break;
+                        case "SendKeysToElementByClass":
+                            selectedElement = driver.FindElements(By.ClassName(element))[arrayIndex];
+                            break;
+                        default: break;
+                    }
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Log.Write("Array index: " + arrayIndex + " is invalid for element: " + element);
+                    throw;
+                }
+                catch (Exception)
+                {
+                    Log.Write("Unable to send keys to element: " + element + " using: " + selectorType);
+                    throw;
+                }
+            }
+            else
+            {
+                Log.Write("Selection method: " + selectorType + " is not supported in this class");
+                throw new MissingMethodException();
+            }
+
+            //Do sleep
+            Sleep(sleepTime);
+
+            //Click the selected element
+            try
+            {
+                selectedElement.SendKeys(keys);
+                Log.Write("Clicked: " + element);
+            }
+            catch (Exception)
+            {
+                Log.Write("Unable to send keys to element: " + element);
+            }
+
+            //Do sleep
+            Sleep(sleepTime);
+
+            //Take screenshot
+            if (screenshotName != null)
+            {
+                try
+                {
+                    ScreenCapture(screenshotName);
+                }
+                catch (Exception)
+                {
+                    Log.Write("Unable to capture screenshot:  " + screenshotName);
+                }
+            }
+            Log.Write("Completed function: " + MethodBase.GetCurrentMethod().DeclaringType.Name + "-" + MethodBase.GetCurrentMethod());
         }
 
     }
